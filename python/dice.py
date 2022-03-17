@@ -1,3 +1,4 @@
+import statistics
 import random
 
 def roll (operation : str):
@@ -46,14 +47,22 @@ def advRoll (operation : str, avantageLevel : int):
             
 
 def averageRoll (operation : str, avantageLevel : int, iteration : int) :
-    averageTable = []
     totalRoll = 0
-
-    for i in range(0, iteration):
-        averageTable.append(advRoll(operation, avantageLevel)) 
     
+    averageTable = multiRoll(operation, avantageLevel, iteration)
     for j in range(0, len(averageTable)):
         totalRoll = totalRoll + averageTable[j]
     totalRoll = totalRoll/len(averageTable)
 
     return totalRoll
+
+def multiRoll (operation : str, avantageLevel : int, iteration : int) :
+    averageTable = []
+
+    for i in range(0, iteration):
+        averageTable.append(advRoll(operation, avantageLevel))
+    
+    return averageTable
+
+def medianRoll (operation : str, avantageLevel : int, iteration : int) :
+    return statistics.median(multiRoll(operation, avantageLevel, iteration))
