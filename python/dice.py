@@ -47,22 +47,34 @@ def advRoll (operation : str, avantageLevel : int):
             
 
 def averageRoll (operation : str, avantageLevel : int, iteration : int) :
-    totalRoll = 0
-    
-    averageTable = multiRoll(operation, avantageLevel, iteration)
-    for j in range(0, len(averageTable)):
-        totalRoll = totalRoll + averageTable[j]
-    totalRoll = totalRoll/len(averageTable)
-
-    return totalRoll
+    return statistics.mean(multiRoll(operation, avantageLevel, iteration))
 
 def multiRoll (operation : str, avantageLevel : int, iteration : int) :
-    averageTable = []
+    RollTable = []
 
     for i in range(0, iteration):
-        averageTable.append(advRoll(operation, avantageLevel))
-    
-    return averageTable
+        RollTable.append(advRoll(operation, avantageLevel))
+
+    return RollTable
 
 def medianRoll (operation : str, avantageLevel : int, iteration : int) :
     return statistics.median(multiRoll(operation, avantageLevel, iteration))
+
+def removeLowerRoll (operation : str, avantageLevel : int, howManyDice : int, toRemove : int) :
+    if (howManyDice <= toRemove) :
+        print ("No more dice !")
+    
+    RollTable = multiRoll(operation, avantageLevel, howManyDice)
+
+    for i in range(0, toRemove):
+        RollTable.remove(min(RollTable))
+
+    return RollTable
+
+def removeHigherRoll (operation : str, avantageLevel : int, howManyDice : int, toRemove : int) :
+    if (howManyDice <= toRemove) :
+        print ("No more dice !")
+    RollTable = multiRoll(operation, avantageLevel, howManyDice)
+    for i in range(0, toRemove):
+        RollTable.remove(max(RollTable))
+    return RollTable
