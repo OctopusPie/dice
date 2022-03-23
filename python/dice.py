@@ -18,7 +18,8 @@ def roll (operation : str):
         if (opDice[0] == ''):
             opDice[0] = "1"
         for i in range(0, int(opDice[0])) :
-            opResult = opResult + random.randint(1, int(opBonus[0])) + int(opBonus[1])
+            opResult = opResult + random.randint(1, int(opBonus[0]))
+        opResult = opResult + int(opBonus[1])
     else :
         print("No d (o_O) ?")
 
