@@ -1,5 +1,8 @@
-import statistics
-import random
+from statistics import (
+    mean,
+    median,
+)
+from random import randint
 
 def roll (operation : str):
     opParsed = parser(operation)
@@ -7,9 +10,9 @@ def roll (operation : str):
     if (opParsed[0] == ''):
         opParsed[0] = "1"
     for i in range(0, int(opParsed[0])) :
-        opResult = opResult + random.randint(1, int(opParsed[1]))
+        opResult = opResult + randint(1, int(opParsed[1]))
     opResult = opResult + int(opParsed[2])
-    
+
     return opResult
 
 def parser(operation : str):
@@ -51,7 +54,7 @@ def advRoll (operation : str, avantageLevel : int):
             
 
 def averageRoll (operation : str, avantageLevel : int, iteration : int) :
-    return statistics.mean(multiRoll(operation, avantageLevel, iteration))
+    return mean(multiRoll(operation, avantageLevel, iteration))
 
 def multiRoll (operation : str, avantageLevel : int, iteration : int) :
     RollTable = []
@@ -62,7 +65,7 @@ def multiRoll (operation : str, avantageLevel : int, iteration : int) :
     return RollTable
 
 def medianRoll (operation : str, avantageLevel : int, iteration : int) :
-    return statistics.median(multiRoll(operation, avantageLevel, iteration))
+    return median(multiRoll(operation, avantageLevel, iteration))
 
 def removeLowerRoll (operation : str, avantageLevel : int, howManyDice : int, toRemove : int) :
     if (howManyDice <= toRemove) :
