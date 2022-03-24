@@ -1,4 +1,6 @@
-from dice import dice
+
+from python.src import dice
+
 
 def test_parser():
     assert dice.parser("5d4-2") == [5, 4, -2]
