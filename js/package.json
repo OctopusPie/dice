@@ -1,0 +1,14 @@
+{
+  "name": "api-dice-js",
+  "version": "0.0.1",
+  "description": "REST API to handle roll dice for DnD",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arthur `Haborym` Vadrot",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
