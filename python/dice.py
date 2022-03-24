@@ -2,28 +2,31 @@ import statistics
 import random
 
 def roll (operation : str):
-
+    opParsed = parser(operation)
     opResult = 0
+    if (opParsed[0] == ''):
+        opParsed[0] = "1"
+    for i in range(0, int(opParsed[0])) :
+        opResult = opResult + random.randint(1, int(opParsed[1]))
+    opResult = opResult + int(opParsed[2])
+    
+    return opResult
+
+def parser(operation : str):
     if 'd' in operation:
         opDice = operation.split("d")
         if '+' in opDice[1]:
-            opBonus = opDice[1].split("+")
+            opValues = opDice[1].split("+")
         elif '-' in opDice[1]:
-            opBonus = opDice[1].split("-")
-            opBonus[1] = int(opBonus[1])*-1
+            opValues = opDice[1].split("-")
+            opValues[1] = int(opValues[1])*-1
         else:
-            opBonus = [opDice[1], 0]
-
-
-        if (opDice[0] == ''):
-            opDice[0] = "1"
-        for i in range(0, int(opDice[0])) :
-            opResult = opResult + random.randint(1, int(opBonus[0]))
-        opResult = opResult + int(opBonus[1])
+            opValues = [opDice[1], 0]
+        opValues.insert(0, opDice[0])
+        return opValues
     else :
-        print("No d (o_O) ?")
+        print("\nBad format, dice operations should be written like this : [number of dice]d[dice value][+ or -][number to add]\n")
 
-    return opResult
 
 def advRoll (operation : str, avantageLevel : int):
 
