@@ -9,6 +9,7 @@
   "author": "Arthur `Haborym` Vadrot",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.19.2",
     "express": "^4.17.3"
   }
 }
