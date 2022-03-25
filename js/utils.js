@@ -54,29 +54,8 @@ function parsing(roll) {
     }
 
     const dices = roll.split('d');
-    
-    /**
-     * sign :   -1  = negative delta
-     *           0  = nothing
-     *           1  = positive delta
-     */
-    let sign = 0;
-    let delta = 0;
-    if(dices[1].includes('+')) {
-        sign = 1;
-
-        const tmp_dice = dices[1].split('+');
-        dices[1] = tmp_dice[0];
-        delta = parseInt(tmp_dice[1]);
-    } else if (dices[1].includes('-')) {
-        sign = -1;
-
-        const tmp_dice = dices[1].split('-');
-        dices[1] = tmp_dice[0];
-        delta = parseInt(tmp_dice[1]);
-    }
-    
-    if(dices.length === 0) {
+    console.log('dices ' + dices);    
+    if(dices === undefined || dices.length < 2) {
         return {
             data: {},
             success: false,
@@ -86,6 +65,27 @@ function parsing(roll) {
             }
         };
     }
+
+    /**
+     * sign :   -1  = negative delta
+     *           0  = nothing
+     *           1  = positive delta
+     */
+     let sign = 0;
+     let delta = 0;
+     if(dices[1].includes('+')) {
+         sign = 1;
+ 
+         const tmp_dice = dices[1].split('+');
+         dices[1] = tmp_dice[0];
+         delta = parseInt(tmp_dice[1]);
+     } else if (dices[1].includes('-')) {
+         sign = -1;
+ 
+         const tmp_dice = dices[1].split('-');
+         dices[1] = tmp_dice[0];
+         delta = parseInt(tmp_dice[1]);
+     }
 
     let result = 0;
     for(let i = 0; i < dices[0]; i++) {
