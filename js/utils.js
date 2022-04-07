@@ -4,25 +4,10 @@
  * @returns object
  */
 exports.roll = (params) => {
-    if(isEmpty(params)) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is empty'
-            }
-        };
-    }
-    if(isMissing(params, 'roll')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
+    const checking = checkPOSTObject(params, ['roll']);
+
+    if(!checking.success) {
+        return checking.response;
     }
 
     // const types = ['string'];
@@ -32,6 +17,8 @@ exports.roll = (params) => {
     //         error: `data in key roll does not match any of the following [${types.join(',')}]`
     //     };
     // }
+
+    console.log('checking : ' + checking);
 
     return parsing(params.roll);
 };
@@ -45,45 +32,10 @@ exports.roll = (params) => {
  * @returns object
  */
 exports.average = (params) => {
-    if(isEmpty(params)) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is empty'
-            }
-        };
-    }
-    if(isMissing(params, 'roll')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
-    }
-    if(isMissing(params, 'level')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
-    }
-    if(isMissing(params, 'repetition')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
+    const checking = checkPOSTObject(params, ['roll', 'level', 'repetition']);
+
+    if(!checking) {
+        return checking.response;
     }
 
     let rollsResult = [];
@@ -168,6 +120,7 @@ exports.median = (params) => {
  * @returns object
  */
 function parsing(roll) {
+    console.log(roll);
     if(roll.length === 0) {
         return {
             data: {},
@@ -251,6 +204,49 @@ function rollDice(repetition, dice) {
         nativeResult: nativeResult,
         result: result,
         delta: (sign === 1 ? '+' : sign === -1 ? '-' : '') + delta
+    };
+}
+
+/**
+ * 
+ * @param {object} params   Content of the POST
+ * @param {array}  targets  Array of key to look for in the object
+ * @returns object
+ */
+function checkPOSTObject(params, targets) {
+    let response = {};
+    let success = true;
+    if(isEmpty(params)) {
+        success = false;
+        response = {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is empty'
+            }
+        };
+    }
+
+    if(success) {
+        targets.forEach(key => {
+            if(isMissing(params, key)) {
+                success = false;
+                response = {
+                    data: {},
+                    success: false,
+                    error: {
+                        code: 1,
+                        msg: `POST is missing ${key} key`
+                    }
+                };
+            }
+        });
+    }
+
+    return {
+        success: success,
+        response: response
     };
 }
 
