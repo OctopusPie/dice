@@ -70,48 +70,43 @@ exports.average = (params) => {
  * @returns object
  */
 exports.median = (params) => {
-    if(isEmpty(params)) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is empty'
-            }
-        };
-    }
-    if(isMissing(params, 'roll')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
-    }
-    if(isMissing(params, 'level')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
-    }
-    if(isMissing(params, 'repetition')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
+    const checking = checkPOSTObject(params, ['roll', 'level', 'repetition']);
+    if(!checking) {
+        return checking.response;
     }
 
-    return result;
+    let rollsResult = [];
+    let median = [];
+    for(let i = 0; i < params.repetition; i++) {
+        const roll = parsing(params.roll);
+        rollsResult.push(roll);
+        median.push(roll.data.result);
+    }
+    console.log(median);
+    median.sort((a, b) => a - b);
+    console.log(median);
+
+    let results = null;
+    if(median.length % 2 === 0) {
+        median[median.length / 2];
+        results = (median[median.length / 2] + median[(median.length / 2) - 1]) / 2;
+    } else {
+        results = median[parseInt(median.length / 2)];
+    }
+
+    return {
+        success: true,
+        data: {
+            result: results ?? 'An error happened',
+            nativeRoll: params.roll,
+            repetition:  params.repetition,
+            rolls: rollsResult,
+        },
+        error: {
+            code: 0,
+            msg: ''
+        }
+    };
 }
 
 /**
