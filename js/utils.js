@@ -34,6 +34,64 @@ exports.roll = (params) => {
     // }
 
     return parsing(params.roll);
+};
+
+/**
+ * Function that calculate the average of the POST data
+ * 
+ * values expected [roll, level, repetition]
+ * 
+ * @param {object} params Content of the POST
+ * @returns object
+ */
+exports.average = (params) => {
+    if(isEmpty(params)) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is empty'
+            }
+        };
+    }
+    if(isMissing(params, 'roll')) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is missing roll key'
+            }
+        };
+    }
+    if(isMissing(params, 'level')) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is missing roll key'
+            }
+        };
+    }
+    if(isMissing(params, 'repetition')) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is missing roll key'
+            }
+        };
+    }
+
+    let rollsResult = [];
+    for(let i = 0; i < params.repetition; i++) {
+        rollsResult.push(parsing(params.roll));
+    }
+
+    return rollsResult;
 }
 
 /**
@@ -66,44 +124,14 @@ function parsing(roll) {
         };
     }
 
-    /**
-     * sign :   -1  = negative delta
-     *           0  = nothing
-     *           1  = positive delta
-     */
-     let sign = 0;
-     let delta = 0;
-     if(dices[1].includes('+')) {
-         sign = 1;
- 
-         const tmp_dice = dices[1].split('+');
-         dices[1] = tmp_dice[0];
-         delta = parseInt(tmp_dice[1]);
-     } else if (dices[1].includes('-')) {
-         sign = -1;
- 
-         const tmp_dice = dices[1].split('-');
-         dices[1] = tmp_dice[0];
-         delta = parseInt(tmp_dice[1]);
-     }
-
-    let result = 0;
-    for(let i = 0; i < dices[0]; i++) {
-        result += (Math.floor(Math.random() * dices[1]) + 1);
-    }
-    const nativeResult = result;
-    if(sign === 1) {
-        result += delta;
-    } else if(sign === -1) {
-        result -= delta;
-    }
+    const diceResult = rollDice(dices[0], dices[1]);
 
     return {
         success: true,
         data: {
-            result: result,
-            nativeResult: nativeResult,
-            modifier: (sign === 1 ? '+' : sign === -1 ? '-' : '') + delta,
+            result: diceResult.result,
+            nativeResult: diceResult.nativeResult,
+            modifier:  diceResult.delta,
         },
         error: {
             code: 0,
@@ -113,9 +141,55 @@ function parsing(roll) {
 }
 
 /**
+ * 
+ * @param {string} repetition Number of dice
+ * @param {string} dice Value of the Dice and delta if added
+ * @returns {object}
+ */
+function rollDice(repetition, dice) {
+    /**
+     * sign :   -1  = negative delta
+     *           0  = nothing
+     *           1  = positive delta
+     */
+     let sign = 0;
+     let delta = 0;
+     if(dice.includes('+')) {
+         sign = 1;
+ 
+         const tmp_dice = dice.split('+');
+         dice = tmp_dice[0];
+         delta = parseInt(tmp_dice[1]);
+     } else if (dice.includes('-')) {
+         sign = -1;
+ 
+         const tmp_dice = dice.split('-');
+         dice = tmp_dice[0];
+         delta = parseInt(tmp_dice[1]);
+     }
+
+    let result = 0;
+    for(let i = 0; i < repetition; i++) {
+        result += (Math.floor(Math.random() * dice) + 1);
+    }
+    const nativeResult = result;
+    if(sign === 1) {
+        result += delta;
+    } else if(sign === -1) {
+        result -= delta;
+    }
+
+    return {
+        nativeResult: nativeResult,
+        result: result,
+        delta: (sign === 1 ? '+' : sign === -1 ? '-' : '') + delta
+    };
+}
+
+/**
  * Test if data is one of the type asked
  * @param {any} data Roll that can be in different type
- * @param {array} type Array of type that data must match
+ * @param {Array<string>} type Array of type that data must match
  * @returns boolean
  */
 function isValid(data, type) {
