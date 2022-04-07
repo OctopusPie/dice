@@ -87,11 +87,79 @@ exports.average = (params) => {
     }
 
     let rollsResult = [];
+    let avg = 0;
     for(let i = 0; i < params.repetition; i++) {
-        rollsResult.push(parsing(params.roll));
+        const roll = parsing(params.roll);
+        rollsResult.push(roll);
+        avg += roll.data.result;
     }
 
-    return rollsResult;
+    return {
+        success: true,
+        data: {
+            result: parseFloat(avg/params.repetition),
+            nativeRoll: params.roll,
+            repetition:  params.repetition,
+            rolls: rollsResult,
+        },
+        error: {
+            code: 0,
+            msg: ''
+        }
+    };
+}
+
+/**
+ * Function that calculate the median vlaue of the POST data
+ * 
+ * values expected [roll, level, repetition]
+ * 
+ * @param {object} params Content of the POST
+ * @returns object
+ */
+exports.median = (params) => {
+    if(isEmpty(params)) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is empty'
+            }
+        };
+    }
+    if(isMissing(params, 'roll')) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is missing roll key'
+            }
+        };
+    }
+    if(isMissing(params, 'level')) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is missing roll key'
+            }
+        };
+    }
+    if(isMissing(params, 'repetition')) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is missing roll key'
+            }
+        };
+    }
+
+    return result;
 }
 
 /**

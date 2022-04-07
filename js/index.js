@@ -23,7 +23,13 @@ app.post('/average', (req,res) => {
     res.status(200).json(utils.average(req.body));
 });
 
-// POST /average    : k:params  v:[operation, intensite, repetition]
-// POST /median     : k:params  v:[operation, intensite, repetition]
-// POST /lowerRoll  : k:params  v:[operation, intensite, diceNumber, minus]
-// POST /higherRoll : k:params  v:[operation, intensite, diceNumber, minus]
+app.post('/median', (req,res) => {
+    console.log('POST /average');
+    res.status(200).json(utils.mean(req.body));
+});
+
+// POST /roll       : k:params  v:[operation]                               STATUS : DONE    - TEST : DONE
+// POST /average    : k:params  v:[operation, intensite, repetition]        STATUS : DONE    - TEST : NEEDED
+// POST /median     : k:params  v:[operation, intensite, repetition]        STATUS : PENDING - TEST : NEEDED
+// POST /lowerRoll  : k:params  v:[operation, intensite, diceNumber, minus] STATUS : NONE    - TEST : NEEDED
+// POST /higherRoll : k:params  v:[operation, intensite, diceNumber, minus] STATUS : NONE    - TEST : NEEDED
