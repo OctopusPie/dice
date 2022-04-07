@@ -12,7 +12,24 @@ app.listen(CONFIG.listeningPort, () => {
     console.log('Server is listening');
 });
 
+// Routes
 app.post('/roll', (req,res) => {
     console.log('POST /roll');
     res.status(200).json(utils.roll(req.body));
-})
+});
+
+app.post('/average', (req,res) => {
+    console.log('POST /average');
+    res.status(200).json(utils.average(req.body));
+});
+
+app.post('/median', (req,res) => {
+    console.log('POST /median');
+    res.status(200).json(utils.median(req.body));
+});
+
+// POST /roll       : k:params  v:[operation]                               STATUS : DONE    - TEST : DONE
+// POST /average    : k:params  v:[operation, intensite, repetition]        STATUS : DONE    - TEST : NEEDED
+// POST /median     : k:params  v:[operation, intensite, repetition]        STATUS : DONE    - TEST : NEEDED
+// POST /lowerRoll  : k:params  v:[operation, intensite, diceNumber, minus] STATUS : NONE    - TEST : NEEDED
+// POST /higherRoll : k:params  v:[operation, intensite, diceNumber, minus] STATUS : NONE    - TEST : NEEDED
