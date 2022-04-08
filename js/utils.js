@@ -170,6 +170,17 @@ function parsing(roll, minus = 0) {
         };
     }
 
+    if(minus < 0) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 11,
+                msg: 'minus value can\'t be negative'
+            }
+        };
+    }
+
     const dices = roll.split('d');
     if(dices === undefined || dices.length < 2) {
         return {
