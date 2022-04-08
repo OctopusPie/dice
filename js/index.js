@@ -28,6 +28,11 @@ app.post('/median', (req,res) => {
     res.status(200).json(utils.median(req.body));
 });
 
+app.post('/lowerRoll', (req,res) => {
+    console.log('POST /lowerRoll');
+    res.status(200).json(utils.targetRoll(req.body, false));
+});
+
 // POST /roll       : k:params  v:[operation]                               STATUS : DONE    - TEST : DONE
 // POST /average    : k:params  v:[operation, intensite, repetition]        STATUS : DONE    - TEST : NEEDED
 // POST /median     : k:params  v:[operation, intensite, repetition]        STATUS : DONE    - TEST : NEEDED
