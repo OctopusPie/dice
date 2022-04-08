@@ -182,6 +182,17 @@ function parsing(roll, minus = 0) {
         };
     }
 
+    if(dices[0] - minus < 1) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 30,
+                msg: `Wrong value for minus. Minus can't be greater or equal than the number of dices.\nHere ${minus} was given for ${dices[0]} dice(s)`
+            }
+        };
+    }
+
     const diceResult = rollDice(dices[0] - minus, dices[1]);
 
     return {
