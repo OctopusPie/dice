@@ -18,8 +18,6 @@ exports.roll = (params) => {
     //     };
     // }
 
-    console.log('checking : ' + checking);
-
     return parsing(params.roll);
 };
 
@@ -82,9 +80,7 @@ exports.median = (params) => {
         rollsResult.push(roll);
         median.push(roll.data.result);
     }
-    console.log(median);
     median.sort((a, b) => a - b);
-    console.log(median);
 
     let results = null;
     if(median.length % 2 === 0) {
@@ -110,12 +106,58 @@ exports.median = (params) => {
 }
 
 /**
+ * Function that returns the lowest roll of all
+ * 
+ * values expected [roll, level, repetition, minus]
+ * 
+ * @param {object} params 
+ * @param {boolean} order true : greatest, false : lowest
+ * @returns object
+ */
+exports.targetRoll = (params, order) => { //TODO integrate minus param
+    const checking = checkPOSTObject(params, ['roll', 'level', 'repetition', 'minus']);
+    if(!checking.success) {
+        return checking.response;
+    }
+
+    let rollsResult = [];
+    let targetValue = null;
+    for(let i = 0; i < params.repetition; i++) {
+        const roll = parsing(params.roll);
+        rollsResult.push(roll);
+
+        if(order) {
+            if(targetValue === null || targetValue.data.result < roll.data.result) {
+                targetValue = roll;
+            }
+        } else {
+            if(targetValue === null || targetValue.data.result >= roll.data.result) {
+                targetValue = roll;
+            }
+        }
+    }
+
+    return {
+        success: true,
+        data: {
+            result: targetValue ?? 'An error happened',
+            nativeRoll: params.roll,
+            repetition:  params.repetition,
+            rolls: rollsResult,
+        },
+        error: {
+            code: 0,
+            msg: ''
+        }
+    };
+}
+
+/**
  * Function that parse the string to try to make the calculations
  * @param {string} roll String that contains the roll
  * @returns object
  */
 function parsing(roll) {
-    console.log(roll);
     if(roll.length === 0) {
         return {
             data: {},
@@ -128,7 +170,6 @@ function parsing(roll) {
     }
 
     const dices = roll.split('d');
-    console.log('dices ' + dices);    
     if(dices === undefined || dices.length < 2) {
         return {
             data: {},
@@ -225,16 +266,17 @@ function checkPOSTObject(params, targets) {
 
     if(success) {
         targets.forEach(key => {
-            if(isMissing(params, key)) {
+            if(success && isMissing(params, key)) {
                 success = false;
                 response = {
                     data: {},
                     success: false,
                     error: {
                         code: 1,
-                        msg: `POST is missing ${key} key`
+                        msg: `POST is missing ${key} key and/or value`
                     }
                 };
+                console.log(`ERROR : POST is missing ${key} key and/or value`);
             }
         });
     }
@@ -281,5 +323,7 @@ function isEmpty(obj) {
  * @returns boolean
  */
 function isMissing(obj, key) {
-    return !obj.hasOwnProperty(key);
+    if(!obj.hasOwnProperty(key)) {return true;}
+    if(key === undefined || key === null) {return true;}
+    return false;
 }
