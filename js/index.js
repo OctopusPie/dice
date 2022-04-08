@@ -28,6 +28,11 @@ app.post('/median', (req,res) => {
     res.status(200).json(utils.median(req.body));
 });
 
+app.post('/higherRoll', (req,res) => {
+    console.log('POST /higherRoll');
+    res.status(200).json(utils.targetRoll(req.body, true));
+});
+
 app.post('/lowerRoll', (req,res) => {
     console.log('POST /lowerRoll');
     res.status(200).json(utils.targetRoll(req.body, false));
