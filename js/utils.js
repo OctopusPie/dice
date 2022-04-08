@@ -170,6 +170,17 @@ function parsing(roll, minus = 0) {
         };
     }
 
+    if(minus < 0) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 11,
+                msg: 'minus value can\'t be negative'
+            }
+        };
+    }
+
     const dices = roll.split('d');
     if(dices === undefined || dices.length < 2) {
         return {
@@ -178,6 +189,17 @@ function parsing(roll, minus = 0) {
             error: {
                 code: 20,
                 msg: 'wrong format should look like this : [number of dice]d[dice value][+ or -][number to add]'
+            }
+        };
+    }
+
+    if(dices[0] - minus < 1) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 30,
+                msg: `Wrong value for minus. Minus can't be greater or equal than the number of dices.\nHere ${minus} was given for ${dices[0]} dice(s)`
             }
         };
     }
