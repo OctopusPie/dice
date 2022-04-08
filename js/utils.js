@@ -4,25 +4,10 @@
  * @returns object
  */
 exports.roll = (params) => {
-    if(isEmpty(params)) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is empty'
-            }
-        };
-    }
-    if(isMissing(params, 'roll')) {
-        return {
-            data: {},
-            success: false,
-            error: {
-                code: 1,
-                msg: 'POST is missing roll key'
-            }
-        };
+    const checking = checkPOSTObject(params, ['roll']);
+
+    if(!checking.success) {
+        return checking.response;
     }
 
     // const types = ['string'];
@@ -34,14 +19,146 @@ exports.roll = (params) => {
     // }
 
     return parsing(params.roll);
+};
+
+/**
+ * Function that calculate the average of the POST data
+ * 
+ * values expected [roll, level, repetition]
+ * 
+ * @param {object} params Content of the POST
+ * @returns object
+ */
+exports.average = (params) => {
+    const checking = checkPOSTObject(params, ['roll', 'level', 'repetition']);
+
+    if(!checking) {
+        return checking.response;
+    }
+
+    let rollsResult = [];
+    let avg = 0;
+    for(let i = 0; i < params.repetition; i++) {
+        const roll = parsing(params.roll);
+        rollsResult.push(roll);
+        avg += roll.data.result;
+    }
+
+    return {
+        success: true,
+        data: {
+            result: parseFloat(avg/params.repetition),
+            nativeRoll: params.roll,
+            repetition:  params.repetition,
+            rolls: rollsResult,
+        },
+        error: {
+            code: 0,
+            msg: ''
+        }
+    };
+}
+
+/**
+ * Function that calculate the median vlaue of the POST data
+ * 
+ * values expected [roll, level, repetition]
+ * 
+ * @param {object} params Content of the POST
+ * @returns object
+ */
+exports.median = (params) => {
+    const checking = checkPOSTObject(params, ['roll', 'level', 'repetition']);
+    if(!checking) {
+        return checking.response;
+    }
+
+    let rollsResult = [];
+    let median = [];
+    for(let i = 0; i < params.repetition; i++) {
+        const roll = parsing(params.roll);
+        rollsResult.push(roll);
+        median.push(roll.data.result);
+    }
+    median.sort((a, b) => a - b);
+
+    let results = null;
+    if(median.length % 2 === 0) {
+        median[median.length / 2];
+        results = (median[median.length / 2] + median[(median.length / 2) - 1]) / 2;
+    } else {
+        results = median[parseInt(median.length / 2)];
+    }
+
+    return {
+        success: true,
+        data: {
+            result: results ?? 'An error happened',
+            nativeRoll: params.roll,
+            repetition:  params.repetition,
+            rolls: rollsResult,
+        },
+        error: {
+            code: 0,
+            msg: ''
+        }
+    };
+}
+
+/**
+ * Function that returns the lowest roll of all
+ * 
+ * values expected [roll, level, repetition, minus]
+ * 
+ * @param {object} params 
+ * @param {boolean} order true : greatest, false : lowest
+ * @returns object
+ */
+exports.targetRoll = (params, order) => { // TODO integrate minus param
+    const checking = checkPOSTObject(params, ['roll', 'level', 'repetition', 'minus']);
+    if(!checking.success) {
+        return checking.response;
+    }
+
+    let rollsResult = [];
+    let targetValue = null;
+    for(let i = 0; i < params.repetition; i++) {
+        const roll = parsing(params.roll, params.minus);
+        rollsResult.push(roll);
+
+        if(order) {
+            if(targetValue === null || targetValue.data.result < roll.data.result) {
+                targetValue = roll;
+            }
+        } else {
+            if(targetValue === null || targetValue.data.result >= roll.data.result) {
+                targetValue = roll;
+            }
+        }
+    }
+
+    return {
+        success: true,
+        data: {
+            result: targetValue ?? 'An error happened',
+            nativeRoll: params.roll,
+            repetition:  params.repetition,
+            rolls: rollsResult,
+        },
+        error: {
+            code: 0,
+            msg: ''
+        }
+    };
 }
 
 /**
  * Function that parse the string to try to make the calculations
  * @param {string} roll String that contains the roll
+ * @param {number} minus Number of dice deduced from the roll. Default 0
  * @returns object
  */
-function parsing(roll) {
+function parsing(roll, minus = 0) {
     if(roll.length === 0) {
         return {
             data: {},
@@ -53,30 +170,19 @@ function parsing(roll) {
         };
     }
 
-    const dices = roll.split('d');
-    
-    /**
-     * sign :   -1  = negative delta
-     *           0  = nothing
-     *           1  = positive delta
-     */
-    let sign = 0;
-    let delta = 0;
-    if(dices[1].includes('+')) {
-        sign = 1;
-
-        const tmp_dice = dices[1].split('+');
-        dices[1] = tmp_dice[0];
-        delta = parseInt(tmp_dice[1]);
-    } else if (dices[1].includes('-')) {
-        sign = -1;
-
-        const tmp_dice = dices[1].split('-');
-        dices[1] = tmp_dice[0];
-        delta = parseInt(tmp_dice[1]);
+    if(minus < 0) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 11,
+                msg: 'minus value can\'t be negative'
+            }
+        };
     }
-    
-    if(dices.length === 0) {
+
+    const dices = roll.split('d');
+    if(dices === undefined || dices.length < 2) {
         return {
             data: {},
             success: false,
@@ -87,23 +193,25 @@ function parsing(roll) {
         };
     }
 
-    let result = 0;
-    for(let i = 0; i < dices[0]; i++) {
-        result += (Math.floor(Math.random() * dices[1]) + 1);
+    if(dices[0] - minus < 1) {
+        return {
+            data: {},
+            success: false,
+            error: {
+                code: 30,
+                msg: `Wrong value for minus. Minus can't be greater or equal than the number of dices.\nHere ${minus} was given for ${dices[0]} dice(s)`
+            }
+        };
     }
-    const nativeResult = result;
-    if(sign === 1) {
-        result += delta;
-    } else if(sign === -1) {
-        result -= delta;
-    }
+
+    const diceResult = rollDice(dices[0] - minus, dices[1]);
 
     return {
         success: true,
         data: {
-            result: result,
-            nativeResult: nativeResult,
-            modifier: (sign === 1 ? '+' : sign === -1 ? '-' : '') + delta,
+            result: diceResult.result,
+            nativeResult: diceResult.nativeResult,
+            modifier:  diceResult.delta,
         },
         error: {
             code: 0,
@@ -113,9 +221,99 @@ function parsing(roll) {
 }
 
 /**
+ * 
+ * @param {string} repetition Number of dice
+ * @param {string} dice Value of the Dice and delta if added
+ * @returns {object}
+ */
+function rollDice(repetition, dice) {
+    /**
+     * sign :   -1  = negative delta
+     *           0  = nothing
+     *           1  = positive delta
+     */
+     let sign = 0;
+     let delta = 0;
+     if(dice.includes('+')) {
+         sign = 1;
+ 
+         const tmp_dice = dice.split('+');
+         dice = tmp_dice[0];
+         delta = parseInt(tmp_dice[1]);
+     } else if (dice.includes('-')) {
+         sign = -1;
+ 
+         const tmp_dice = dice.split('-');
+         dice = tmp_dice[0];
+         delta = parseInt(tmp_dice[1]);
+     }
+
+    let result = 0;
+    for(let i = 0; i < repetition; i++) {
+        result += (Math.floor(Math.random() * dice) + 1);
+    }
+    const nativeResult = result;
+    if(sign === 1) {
+        result += delta;
+    } else if(sign === -1) {
+        result -= delta;
+    }
+
+    return {
+        nativeResult: nativeResult,
+        result: result,
+        delta: (sign === 1 ? '+' : sign === -1 ? '-' : '') + delta
+    };
+}
+
+/**
+ * 
+ * @param {object} params   Content of the POST
+ * @param {array}  targets  Array of key to look for in the object
+ * @returns object
+ */
+function checkPOSTObject(params, targets) {
+    let response = {};
+    let success = true;
+    if(isEmpty(params)) {
+        success = false;
+        response = {
+            data: {},
+            success: false,
+            error: {
+                code: 1,
+                msg: 'POST is empty'
+            }
+        };
+    }
+
+    if(success) {
+        targets.forEach(key => {
+            if(success && isMissing(params, key)) {
+                success = false;
+                response = {
+                    data: {},
+                    success: false,
+                    error: {
+                        code: 1,
+                        msg: `POST is missing ${key} key and/or value`
+                    }
+                };
+                console.log(`ERROR : POST is missing ${key} key and/or value`);
+            }
+        });
+    }
+
+    return {
+        success: success,
+        response: response
+    };
+}
+
+/**
  * Test if data is one of the type asked
  * @param {any} data Roll that can be in different type
- * @param {array} type Array of type that data must match
+ * @param {Array<string>} type Array of type that data must match
  * @returns boolean
  */
 function isValid(data, type) {
@@ -148,5 +346,7 @@ function isEmpty(obj) {
  * @returns boolean
  */
 function isMissing(obj, key) {
-    return !obj.hasOwnProperty(key);
+    if(!obj.hasOwnProperty(key)) {return true;}
+    if(key === undefined || key === null) {return true;}
+    return false;
 }

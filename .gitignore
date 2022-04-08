@@ -1,2 +1,5 @@
 ./js/node_module
 js/node_modules/
+
+.vscode
+dice.code-workspace
