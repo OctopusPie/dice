@@ -1,6 +1,6 @@
 {
   "name": "api-dice-js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "REST API to handle roll dice for DnD",
   "main": "index.js",
   "scripts": {
