@@ -32,8 +32,6 @@ Once installed use `npm install express` to download the service. Then in the te
     ```
 - `POST: /average` :
 - `POST: /median` :
-- `POST: /lowerRoll` :
-- `POST: /higherRoll` :
   - Request :
     ```json
     {
@@ -59,6 +57,18 @@ Once installed use `npm install express` to download the service. Then in the te
             "msg": string,
         }
     }
-    ```   
+    ``` 
+- `POST: /lowerRoll` :
+- `POST: /higherRoll` :
+  - Request :
+    ```json
+    {
+        "roll": "[number of dice]d[dice value][+ or -][number to add]",
+        "level": 0, // number
+        "repetition": 1, // number
+        "minus": 1, // number
+    }
+    ```
+  - Response : Same as above
 
 # Python
