@@ -114,7 +114,7 @@ exports.median = (params) => {
  * @param {boolean} order true : greatest, false : lowest
  * @returns object
  */
-exports.targetRoll = (params, order) => { //TODO integrate minus param
+exports.targetRoll = (params, order) => { // TODO integrate minus param
     const checking = checkPOSTObject(params, ['roll', 'level', 'repetition', 'minus']);
     if(!checking.success) {
         return checking.response;
@@ -123,7 +123,7 @@ exports.targetRoll = (params, order) => { //TODO integrate minus param
     let rollsResult = [];
     let targetValue = null;
     for(let i = 0; i < params.repetition; i++) {
-        const roll = parsing(params.roll);
+        const roll = parsing(params.roll, params.minus);
         rollsResult.push(roll);
 
         if(order) {
@@ -155,9 +155,10 @@ exports.targetRoll = (params, order) => { //TODO integrate minus param
 /**
  * Function that parse the string to try to make the calculations
  * @param {string} roll String that contains the roll
+ * @param {number} minus Number of dice deduced from the roll. Default 0
  * @returns object
  */
-function parsing(roll) {
+function parsing(roll, minus = 0) {
     if(roll.length === 0) {
         return {
             data: {},
@@ -181,7 +182,7 @@ function parsing(roll) {
         };
     }
 
-    const diceResult = rollDice(dices[0], dices[1]);
+    const diceResult = rollDice(dices[0] - minus, dices[1]);
 
     return {
         success: true,
