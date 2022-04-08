@@ -30,5 +30,35 @@ Once installed use `npm install express` to download the service. Then in the te
         }
     }
     ```
+- `POST: /average` :
+- `POST: /median` :
+- `POST: /lowerRoll` :
+- `POST: /higherRoll` :
+  - Request :
+    ```json
+    {
+        "roll": "[number of dice]d[dice value][+ or -][number to add]",
+        "level": 0, // number
+        "repetition": 1, // number 
+    }
+    ```
+  - Response :
+    ```json
+    {
+        "success": boolean,
+        "data": {
+            "result": number,
+            "nativeResult": number,
+            "repetition": number,
+            "rolls": [
+                // roll response object
+            ]
+        },
+        "error": {
+            "code": number,
+            "msg": string,
+        }
+    }
+    ```   
 
 # Python
